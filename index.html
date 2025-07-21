@@ -1,0 +1,81 @@
+<html>
+
+<head>
+    <title>Server-Sent Events</title>
+    <script language="javascript">
+        function ClientIdIsChanged() {
+            var messageTable = document.getElementById('tableMessages');
+            var numberOfRows = messageTable.rows.length;
+            for (var index = 0; index < numberOfRows; index++) {
+                messageTable.deleteRow(0);
+            }
+            messageTable = document.getElementById('tableMessagesForClientId');
+            numberOfRows = messageTable.rows.length;
+            for (var index = 0; index < numberOfRows; index++) {
+                messageTable.deleteRow(0);
+            }
+        }
+
+        // var clientId = 0;
+        //const evtSource = new EventSource('http://localhost:3000/events');
+        //const evtSource = new EventSource('http://dbiz-pw03f00m2:3000/events');
+        const evtSource = new EventSource('https://serversentevents-975123501523.herokuapp.com/events');
+
+        evtSource.onmessage = (event) => {
+            document.getElementById('tdPleaseWait').innerHTML = '';
+            var messageTable = document.getElementById('tableMessages');
+            var oneRow = messageTable.insertRow(0);
+            var oneCol = oneRow.insertCell(0);
+            oneCol.innerText = event.data;
+
+            var clientId = event.data.split('|')[0];
+            if (clientIdDdl.options[clientIdDdl.selectedIndex].value === clientId) {
+                var messageTable = document.getElementById('tableMessagesForClientId');
+                var oneRow = messageTable.insertRow(0);
+                var oneCol = oneRow.insertCell(0);
+                oneCol.innerText = event.data;
+            }
+        };
+
+        evtSource.onerror = (error) => {
+            console.error('EventSource failed:', error);
+        };
+
+    </script>
+</head>
+
+<body>
+    <br><br><br>
+    <table width="50%">
+        <tr>
+            <td colspan="2" align="center">
+                <label style="font-size: large; font-weight: bolder;">Select your Client Id: </label>
+                <select id="clientIdDdl" onchange="javascript:ClientIdIsChanged();"
+                    style="font-size: large; font-weight: bolder;">
+                    <option value="ClientId-0">&nbsp;0&nbsp;</option>
+                    <option value="ClientId-1">&nbsp;1&nbsp;</option>
+                    <option value="ClientId-2">&nbsp;2&nbsp;</option>
+                </select>
+            </td>
+        </tr>
+        <tr><td colspan="2">&nbsp;</td></tr>
+        <tr><td colspan="2" id="tdPleaseWait">Please wait. Connection is being established!.....</td></tr>
+        <tr><td colspan="2">&nbsp;</td></tr>
+        <tr>
+            <td width="50%" align="center" style="font-size: large; font-weight: bolder;">All the messages</td>
+            <td width="50%" align="center" style="font-size: large; font-weight: bolder;">Your messages</td>
+        </tr>
+        <tr>
+            <td width="50%" align="center" valign="top">
+                <table id="tableMessages">
+                </table>
+            </td>
+            <td width="50%" align="center" valign="top">
+                <table id="tableMessagesForClientId">
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
